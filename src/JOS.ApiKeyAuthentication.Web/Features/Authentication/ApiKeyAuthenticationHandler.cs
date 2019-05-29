@@ -4,14 +4,18 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using JOS.ApiKeyAuthentication.Web.Features.Authorization;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace JOS.ApiKeyAuthentication.Web.Features.Authentication
 {
     public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthenticationOptions>
     {
+        private const string ProblemDetailsContentType = "application/problem+json";
         private readonly IGetAllApiKeysQuery _getAllApiKeysQuery;
         private const string ApiKeyHeaderName = "X-Api-Key";
         public ApiKeyAuthenticationHandler(
@@ -28,14 +32,14 @@ namespace JOS.ApiKeyAuthentication.Web.Features.Authentication
         {
             if (!Request.Headers.TryGetValue(ApiKeyHeaderName, out var apiKeyHeaderValues))
             {
-                return AuthenticateResult.Fail($"No '{ApiKeyHeaderName}' header was present in the request");
+                return AuthenticateResult.NoResult();
             }
 
             var providedApiKey = apiKeyHeaderValues.FirstOrDefault();
 
             if (apiKeyHeaderValues.Count == 0 || string.IsNullOrWhiteSpace(providedApiKey))
             {
-                return AuthenticateResult.Fail($"The '{ApiKeyHeaderName}' header value was null or empty");
+                return AuthenticateResult.NoResult();
             }
 
             var existingApiKeys = await _getAllApiKeysQuery.ExecuteAsync();
@@ -52,14 +56,32 @@ namespace JOS.ApiKeyAuthentication.Web.Features.Authentication
                 claims.AddRange(apiKey.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
                 var identity = new ClaimsIdentity(claims, Options.AuthenticationType);
-
                 var identities = new List<ClaimsIdentity> { identity };
-                var ticket = new AuthenticationTicket(new ClaimsPrincipal(identities), Options.Scheme);
+                var principal = new ClaimsPrincipal(identities);
+                var ticket = new AuthenticationTicket(principal, Options.Scheme);
 
                 return AuthenticateResult.Success(ticket);
             }
 
             return AuthenticateResult.Fail("Invalid API Key provided.");
+        }
+
+        protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
+        {
+            Response.StatusCode = 401;
+            Response.ContentType = ProblemDetailsContentType;
+            var problemDetails = new UnauthenticatedProblemDetails();
+
+            await Response.WriteAsync(JsonConvert.SerializeObject(problemDetails));
+        }
+
+        protected override async Task HandleForbiddenAsync(AuthenticationProperties properties)
+        {
+            Response.StatusCode = 403;
+            Response.ContentType = ProblemDetailsContentType;
+            var problemDetails = new UnauthorizedProblemDetails();
+
+            await Response.WriteAsync(JsonConvert.SerializeObject(problemDetails));
         }
     }
 }
