@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -39,7 +40,10 @@ namespace JOS.ApiKeyAuthentication.Web.Tests
             var request = new HttpRequestMessage(HttpMethod.Get, $"api/user/{action}");
 
             var response = await httpClient.SendAsync(request);
+            var responseContent = await response.Content.ReadAsStringAsync();
 
+            response.Content.Headers.ContentType.ToString().ShouldBe("application/problem+json");
+            responseContent.ShouldBe("{\"type\":\"https://httpstatuses.com/401\",\"title\":\"Unauthorized\",\"status\":401}"); // Really naive check, can't guarantee the order of the properties, but whatever :)
             response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
         }
 

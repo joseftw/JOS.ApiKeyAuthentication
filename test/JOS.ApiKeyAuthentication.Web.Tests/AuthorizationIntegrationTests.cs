@@ -28,7 +28,10 @@ namespace JOS.ApiKeyAuthentication.Web.Tests
             request.Headers.Add("X-Api-Key", apiKey);
 
             var response = await httpClient.SendAsync(request);
+            var responseContent = await response.Content.ReadAsStringAsync();
 
+            response.Content.Headers.ContentType.ToString().ShouldBe("application/problem+json");
+            responseContent.ShouldBe("{\"type\":\"https://httpstatuses.com/403\",\"title\":\"Forbidden\",\"status\":403}"); // Really naive check, can't guarantee the order of the properties, but whatever :)
             response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
         }
 
