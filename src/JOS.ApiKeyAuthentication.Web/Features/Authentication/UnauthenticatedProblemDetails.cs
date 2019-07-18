@@ -8,8 +8,8 @@ namespace JOS.ApiKeyAuthentication.Web.Features.Authentication
         {
             Title = "Unauthenticated";
             Detail = details;
-            Status = 403;
-            Type = "https://httpstatuses.com/403";
+            Status = 401;
+            Type = "https://httpstatuses.com/401";
         }
     }
 }
