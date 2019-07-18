@@ -6,10 +6,10 @@ namespace JOS.ApiKeyAuthentication.Web.Features.Authorization
     {
         public UnauthorizedProblemDetails(string details = null)
         {
-            Title = "Forbidden";
+            Title = "Unauthorized";
             Detail = details;
-            Status = 403;
-            Type = "https://httpstatuses.com/403";
+            Status = 401;
+            Type = "https://httpstatuses.com/401";
         }
     }
 }
