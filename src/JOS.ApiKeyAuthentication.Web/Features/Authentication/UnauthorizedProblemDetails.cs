@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace JOS.ApiKeyAuthentication.Web.Features.Authorization
+namespace JOS.ApiKeyAuthentication.Web.Features.Authentication
 {
     public class UnauthorizedProblemDetails : ProblemDetails
     {

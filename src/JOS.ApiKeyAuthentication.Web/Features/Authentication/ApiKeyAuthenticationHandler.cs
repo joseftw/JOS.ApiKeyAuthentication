@@ -70,7 +70,7 @@ namespace JOS.ApiKeyAuthentication.Web.Features.Authentication
         {
             Response.StatusCode = 401;
             Response.ContentType = ProblemDetailsContentType;
-            var problemDetails = new UnauthenticatedProblemDetails();
+            var problemDetails = new UnauthorizedProblemDetails();
 
             await Response.WriteAsync(JsonConvert.SerializeObject(problemDetails));
         }
@@ -79,7 +79,7 @@ namespace JOS.ApiKeyAuthentication.Web.Features.Authentication
         {
             Response.StatusCode = 403;
             Response.ContentType = ProblemDetailsContentType;
-            var problemDetails = new UnauthorizedProblemDetails();
+            var problemDetails = new ForbiddenProblemDetails();
 
             await Response.WriteAsync(JsonConvert.SerializeObject(problemDetails));
         }
