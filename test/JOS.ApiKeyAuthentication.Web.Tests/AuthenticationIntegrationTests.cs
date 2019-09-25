@@ -56,6 +56,7 @@ namespace JOS.ApiKeyAuthentication.Web.Tests
             request.Headers.Add("X-Api-Key", apiKey);
 
             var response = await httpClient.SendAsync(request);
+            var responseContent = await response.Content.ReadAsStringAsync();
 
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
         }

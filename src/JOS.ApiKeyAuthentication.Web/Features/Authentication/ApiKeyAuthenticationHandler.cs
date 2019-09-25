@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Threading.Tasks;
 using JOS.ApiKeyAuthentication.Web.Features.Authorization;
+using JOS.ApiKeyAuthentication.Web.Features.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace JOS.ApiKeyAuthentication.Web.Features.Authentication
 {
@@ -72,7 +73,7 @@ namespace JOS.ApiKeyAuthentication.Web.Features.Authentication
             Response.ContentType = ProblemDetailsContentType;
             var problemDetails = new UnauthorizedProblemDetails();
 
-            await Response.WriteAsync(JsonConvert.SerializeObject(problemDetails));
+            await Response.WriteAsync(JsonSerializer.Serialize(problemDetails, DefaultJsonSerializerOptions.Options));
         }
 
         protected override async Task HandleForbiddenAsync(AuthenticationProperties properties)
@@ -81,7 +82,7 @@ namespace JOS.ApiKeyAuthentication.Web.Features.Authentication
             Response.ContentType = ProblemDetailsContentType;
             var problemDetails = new ForbiddenProblemDetails();
 
-            await Response.WriteAsync(JsonConvert.SerializeObject(problemDetails));
+            await Response.WriteAsync(JsonSerializer.Serialize(problemDetails, DefaultJsonSerializerOptions.Options));
         }
     }
 }

@@ -1,11 +1,12 @@
-﻿using JOS.ApiKeyAuthentication.Web.Features.Authentication;
+﻿using System.Text.Json;
+using JOS.ApiKeyAuthentication.Web.Features.Authentication;
 using JOS.ApiKeyAuthentication.Web.Features.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace JOS.ApiKeyAuthentication.Web
 {
@@ -39,17 +40,28 @@ namespace JOS.ApiKeyAuthentication.Web
 
             services.AddSingleton<IGetAllApiKeysQuery, InMemoryGetAllApiKeysQuery>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddRouting();
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.IgnoreNullValues = true;
+                });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseRouting();
             app.UseAuthentication();
-            app.UseMvc();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }
