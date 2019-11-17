@@ -17,16 +17,16 @@ namespace JOS.ApiKeyAuthentication.Web.Features.Authentication
     public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthenticationOptions>
     {
         private const string ProblemDetailsContentType = "application/problem+json";
-        private readonly IGetAllApiKeysQuery _getAllApiKeysQuery;
+        private readonly IGetApiKeyQuery _getApiKeyQuery;
         private const string ApiKeyHeaderName = "X-Api-Key";
         public ApiKeyAuthenticationHandler(
             IOptionsMonitor<ApiKeyAuthenticationOptions> options,
             ILoggerFactory logger,
             UrlEncoder encoder,
             ISystemClock clock,
-            IGetAllApiKeysQuery getAllApiKeysQuery) : base(options, logger, encoder, clock)
+            IGetApiKeyQuery getApiKeyQuery) : base(options, logger, encoder, clock)
         {
-            _getAllApiKeysQuery = getAllApiKeysQuery ?? throw new ArgumentNullException(nameof(getAllApiKeysQuery));
+            _getApiKeyQuery = getApiKeyQuery ?? throw new ArgumentNullException(nameof(getApiKeyQuery));
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -43,18 +43,16 @@ namespace JOS.ApiKeyAuthentication.Web.Features.Authentication
                 return AuthenticateResult.NoResult();
             }
 
-            var existingApiKeys = await _getAllApiKeysQuery.ExecuteAsync();
+            var existingApiKey = await _getApiKeyQuery.Execute(providedApiKey);
 
-            if (existingApiKeys.ContainsKey(providedApiKey))
+            if (existingApiKey != null)
             {
-                var apiKey = existingApiKeys[providedApiKey];
-
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, apiKey.Owner)
+                    new Claim(ClaimTypes.Name, existingApiKey.Owner)
                 };
 
-                claims.AddRange(apiKey.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
+                claims.AddRange(existingApiKey.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
                 var identity = new ClaimsIdentity(claims, Options.AuthenticationType);
                 var identities = new List<ClaimsIdentity> { identity };

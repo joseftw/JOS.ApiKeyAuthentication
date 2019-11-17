@@ -38,7 +38,7 @@ namespace JOS.ApiKeyAuthentication.Web
             services.AddSingleton<IAuthorizationHandler, OnlyManagersAuthorizationHandler>();
             services.AddSingleton<IAuthorizationHandler, OnlyThirdPartiesAuthorizationHandler>();
 
-            services.AddSingleton<IGetAllApiKeysQuery, InMemoryGetAllApiKeysQuery>();
+            services.AddSingleton<IGetApiKeyQuery, InMemoryGetApiKeyQuery>();
 
             services.AddRouting();
             services.AddControllers()
