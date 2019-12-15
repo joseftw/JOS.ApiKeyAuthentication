@@ -6,6 +6,7 @@ namespace JOS.ApiKeyAuthentication.Web.Features.User
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Produces("application/json")]
     public class UserController : ControllerBase
     {
         [HttpGet("anyone")]
