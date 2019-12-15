@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using JOS.ApiKeyAuthentication.Web.Features.Authorization;
 using JOS.ApiKeyAuthentication.Web.Features.Json;
+using JOS.ApiKeyAuthentication.Web.Features.Shared;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,7 @@ namespace JOS.ApiKeyAuthentication.Web.Features.Authentication
     {
         private const string ProblemDetailsContentType = "application/problem+json";
         private readonly IGetApiKeyQuery _getApiKeyQuery;
-        private const string ApiKeyHeaderName = "X-Api-Key";
+
         public ApiKeyAuthenticationHandler(
             IOptionsMonitor<ApiKeyAuthenticationOptions> options,
             ILoggerFactory logger,
@@ -31,7 +32,7 @@ namespace JOS.ApiKeyAuthentication.Web.Features.Authentication
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            if (!Request.Headers.TryGetValue(ApiKeyHeaderName, out var apiKeyHeaderValues))
+            if (!Request.Headers.TryGetValue(ApiKeyConstants.HeaderName, out var apiKeyHeaderValues))
             {
                 return AuthenticateResult.NoResult();
             }
