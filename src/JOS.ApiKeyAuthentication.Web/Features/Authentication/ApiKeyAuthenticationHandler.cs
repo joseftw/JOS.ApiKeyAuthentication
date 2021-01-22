@@ -63,7 +63,7 @@ namespace JOS.ApiKeyAuthentication.Web.Features.Authentication
                 return AuthenticateResult.Success(ticket);
             }
 
-            return AuthenticateResult.Fail("Invalid API Key provided.");
+            return AuthenticateResult.NoResult();
         }
 
         protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
