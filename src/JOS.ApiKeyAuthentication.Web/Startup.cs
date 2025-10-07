@@ -2,7 +2,6 @@
 using System.Text.Json.Serialization;
 using JOS.ApiKeyAuthentication.Web.Features.Authentication;
 using JOS.ApiKeyAuthentication.Web.Features.Authorization;
-using JOS.ApiKeyAuthentication.Web.Features.Swagger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -48,8 +47,6 @@ namespace JOS.ApiKeyAuthentication.Web
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 });
-
-            services.ConfigureSwaggerFeature();
         }
 
         public void Configure(IApplicationBuilder app, IHostEnvironment env)
@@ -61,12 +58,6 @@ namespace JOS.ApiKeyAuthentication.Web
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "JOS.ApiKeyAuthentication");
-            });
 
             app.UseEndpoints(endpoints =>
             {
